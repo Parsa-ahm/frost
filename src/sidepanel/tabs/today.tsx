@@ -1,34 +1,68 @@
-// Tab: Today
-//
-// LAYOUT (top to bottom):
-//
-// 1. SESSION STATS BAR — 4 chips in a row
-//    [Dials: N]  [Qualified: N]  [No Answer: N]  [Rejected: N]
-//    Source: today's DayStats from background GET_STATS
-//    Updates live as background storage changes
-//
-// 2. FILTER TOGGLE ROW
-//    Toggle switch: "Hide Called/Rejected"
-//    When ON: filter the lead list below to show only status=pending and status=no_answer
-//    When OFF: show all leads touched today (any status except hidden)
-//    Default: ON (matches hideCalledOnMaps setting)
-//
-// 3. LEAD LIST — today's leads, sorted: pending first, no_answer second, rest below
-//    Each row:
-//      [Status dot color] [Business Name]              [Status badge text]
-//                         [Address — muted]            [Call count: Nx]
-//                         [Phone if present — muted]
-//      On row click: expand inline detail with notes textarea + re-status buttons
-//
-//    Re-status buttons (inline, shown when row is expanded):
-//      [No Answer] [Called] [Rejected] [Qualified] [Hide]
-//      [Add to CRM] — shown only if status=qualified and !twentyId
-//
-//    "Today" = leads whose lastCalled date equals today's YYYY-MM-DD
-//    If no leads today: show empty state "No calls yet today. Open Google Maps to start."
-//
-// 4. QUICK NOTES (per lead, expanded state)
-//    Textarea with current lead.notes
-//    Auto-saves on blur via UPDATE_STATUS with current status + new notes
+// Tab: Today — session stats + leads touched today.
 
-export {}
+import { useState } from 'react'
+import type { FrostSettings, IcyLead } from '../../types'
+import { dateKey, todayKey } from '../../utils/stats'
+import { LeadRow } from '../components'
+import { STATUS_ORDER, type Stats } from '../lib'
+
+interface TodayTabProps {
+  leads: Record<string, IcyLead>
+  stats: Stats
+  settings: FrostSettings
+}
+
+export function TodayTab({ leads, stats, settings }: TodayTabProps) {
+  const [hideDone, setHideDone] = useState(settings.hideCalledOnMaps)
+  const today = todayKey()
+
+  let list = Object.values(leads).filter(
+    l => l.status !== 'hidden' && l.lastCalled && dateKey(new Date(l.lastCalled)) === today,
+  )
+  if (hideDone) {
+    list = list.filter(l => l.status === 'pending' || l.status === 'no_answer')
+  }
+  list.sort(
+    (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || a.name.localeCompare(b.name),
+  )
+
+  const t = stats.today
+
+  return (
+    <div className="tab-panel">
+      <div className="chip-row">
+        <div className="chip">
+          <span className="chip-value">{t.dials}</span>
+          <span className="chip-label">Dials</span>
+        </div>
+        <div className={`chip${t.qualified > 0 ? ' chip-green' : ''}`}>
+          <span className="chip-value">{t.qualified}</span>
+          <span className="chip-label">Qualified</span>
+        </div>
+        <div className="chip">
+          <span className="chip-value">{t.noAnswer}</span>
+          <span className="chip-label">No Answer</span>
+        </div>
+        <div className="chip">
+          <span className="chip-value">{t.rejected}</span>
+          <span className="chip-label">Rejected</span>
+        </div>
+      </div>
+
+      <label className="toggle-row">
+        <input type="checkbox" checked={hideDone} onChange={e => setHideDone(e.target.checked)} />
+        <span>Hide Called/Rejected</span>
+      </label>
+
+      {list.length === 0 ? (
+        <div className="empty-state">No calls yet today. Go to Google Maps and start dialing.</div>
+      ) : (
+        <div className="lead-list">
+          {list.map(lead => (
+            <LeadRow key={lead.id} lead={lead} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

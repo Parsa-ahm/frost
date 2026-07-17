@@ -1,20 +1,64 @@
-// Badge injection — creates and updates the status dot on a Maps card.
-//
-// IMPLEMENT:
-//
-// injectBadge(card: Element, lead: IcyLead, onAction: ActionCallback) → void
-//   1. If badge already exists on card, call updateBadge() instead and return.
-//   2. Create a div.frost-badge with data-status={lead.status}
-//   3. If lead.status === 'qualified' and lead.twentyId exists, set data-crm="true"
-//   4. Append badge to card
-//   5. badge.addEventListener('click', (e) => { e.stopPropagation(); showPopover(lead, badge, onAction) })
-//
-// updateBadge(card: Element, lead: IcyLead) → void
-//   Finds the existing .frost-badge on the card.
-//   Updates data-status and data-crm attributes.
-//   If lead.status === 'hidden', sets card.style.display = 'none'.
-//   If lead was hidden but status changed, restores card.style.display = ''.
-//
-// ActionCallback = (leadId: string, outcome: CallEvent['outcome'] | 'hidden', notes: string) => void
+// Badge injection — creates and updates the status dot on a card / pane.
 
-export {}
+import type { CallEvent, IcyLead } from '../types'
+import { showPopover } from './popover'
+
+export type BadgeAction = CallEvent['outcome'] | 'hidden' | 'push_crm'
+export type ActionCallback = (leadId: string, action: BadgeAction, notes: string) => void
+
+// Latest lead per badge element — keeps popovers fresh after status changes
+// without re-binding click listeners.
+const badgeLeads = new WeakMap<Element, IcyLead>()
+
+function applyStatus(badge: HTMLElement, lead: IcyLead): void {
+  badge.dataset.status = lead.status
+  if (lead.status === 'qualified' && lead.twentyId) badge.dataset.crm = 'true'
+  else delete badge.dataset.crm
+}
+
+// `anchor` switches to inline placement (badge appended into the anchor, e.g.
+// the place pane's h1) instead of the default absolute top-right position.
+export function injectBadge(
+  card: HTMLElement,
+  lead: IcyLead,
+  onAction: ActionCallback,
+  anchor?: Element,
+): void {
+  if (card.querySelector('.frost-badge')) {
+    updateBadge(card, lead)
+    return
+  }
+
+  const badge = document.createElement('div')
+  badge.className = anchor ? 'frost-badge frost-badge-inline' : 'frost-badge'
+  badge.title = 'Frost — log this call'
+  applyStatus(badge, lead)
+  badgeLeads.set(badge, lead)
+
+  badge.addEventListener('click', e => {
+    e.stopPropagation()
+    e.preventDefault()
+    const current = badgeLeads.get(badge) ?? lead
+    showPopover(current, badge, onAction)
+  })
+
+  if (anchor) {
+    anchor.appendChild(badge)
+  } else {
+    card.style.position = 'relative'
+    card.appendChild(badge)
+  }
+
+  if (lead.status === 'hidden' && !card.dataset.frostNoHide) card.style.display = 'none'
+}
+
+export function updateBadge(card: HTMLElement, lead: IcyLead): void {
+  const badge = card.querySelector<HTMLElement>('.frost-badge')
+  if (!badge) return
+  badgeLeads.set(badge, lead)
+  applyStatus(badge, lead)
+
+  if (card.dataset.frostNoHide) return
+  if (lead.status === 'hidden') card.style.display = 'none'
+  else if (card.style.display === 'none') card.style.display = ''
+}

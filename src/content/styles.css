@@ -40,8 +40,16 @@
 }
 
 /* Make the Maps card position:relative so our badge can be absolute */
-[data-frost-id] {
+[data-frost-id]:not([data-frost-no-hide]) {
   position: relative !important;
+}
+
+/* Inline variant — sits next to the place pane's h1 title */
+.frost-badge-inline {
+  position: static;
+  display: inline-flex;
+  margin-left: 10px;
+  vertical-align: middle;
 }
 
 /* Popover */
