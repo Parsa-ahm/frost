@@ -1,0 +1,114 @@
+/* Frost content script styles — injected on Google Maps */
+
+/* Status badge dot on each Maps card */
+.frost-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.9);
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.frost-badge:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+/* Badge colors per status */
+.frost-badge[data-status="pending"]    { background: #6b7280; }
+.frost-badge[data-status="no_answer"] { background: #f59e0b; }
+.frost-badge[data-status="called"]    { background: #3b82f6; }
+.frost-badge[data-status="rejected"]  { background: #ef4444; }
+.frost-badge[data-status="qualified"] { background: #22c55e; }
+
+/* CRM checkmark on qualified badge */
+.frost-badge[data-status="qualified"][data-crm="true"]::after {
+  content: '✓';
+  color: white;
+  font-size: 10px;
+}
+
+/* Make the Maps card position:relative so our badge can be absolute */
+[data-frost-id] {
+  position: relative !important;
+}
+
+/* Popover */
+.frost-popover {
+  position: fixed;
+  z-index: 2147483647;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 12px;
+  min-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.frost-popover-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fafafa;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.frost-popover-address {
+  font-size: 11px;
+  color: #71717a;
+  margin-bottom: 10px;
+}
+
+.frost-popover-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.frost-action-btn {
+  border: none;
+  border-radius: 7px;
+  padding: 7px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.1s;
+  color: #fff;
+  text-align: center;
+}
+.frost-action-btn:hover { opacity: 0.85; }
+
+.frost-action-btn.no-answer  { background: #f59e0b; }
+.frost-action-btn.called     { background: #3b82f6; }
+.frost-action-btn.rejected   { background: #ef4444; }
+.frost-action-btn.qualified  { background: #22c55e; }
+.frost-action-btn.hide       { background: #3f3f46; }
+.frost-action-btn.crm        { background: #7c3aed; grid-column: span 2; }
+
+.frost-popover-notes {
+  margin-top: 8px;
+  width: 100%;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  color: #fafafa;
+  font-size: 12px;
+  padding: 6px 8px;
+  resize: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
