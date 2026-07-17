@@ -131,7 +131,7 @@ export function SettingsTab({ settings, onSaved }: SettingsTabProps) {
       {showSetup && (
         <p className="setup-note">
           Create an “Icy Lead” custom object in Twenty before using. Required fields: name (Text),
-          phone (Text), address (Text), status (Select: NO_ANSWER/CALLED/REJECTED/QUALIFIED),
+          phone (Text), businessAddress (Text), status (Select: NO_ANSWER/CALLED/REJECTED/QUALIFIED),
           callCount (Number), firstCalled (DateTime), lastCalled (DateTime), notes (RichText),
           searchQuery (Text)
         </p>

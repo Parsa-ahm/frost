@@ -43,7 +43,7 @@ export function toPayload(lead: IcyLead): TwentyIcyLeadPayload {
   return {
     name: lead.name,
     phone: lead.phone,
-    address: lead.address,
+    businessAddress: lead.address,
     status: STATUS_MAP[lead.status],
     callCount: lead.callCount,
     firstCalled: lead.firstCalled,

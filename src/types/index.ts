@@ -76,7 +76,7 @@ export type BgMessage =
 export interface TwentyIcyLeadPayload {
   name: string
   phone: string
-  address: string
+  businessAddress: string
   status: string
   callCount: number
   firstCalled: string
