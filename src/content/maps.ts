@@ -54,9 +54,14 @@ function watchForLateFeed(): void {
   observer.observe(document.body, { childList: true, subtree: true })
 }
 
+let processTimer: ReturnType<typeof setTimeout> | undefined
+
 function observeFeed(feed: Element): void {
   feedEl = feed
-  const observer = new MutationObserver(() => void processCards())
+  const observer = new MutationObserver(() => {
+    clearTimeout(processTimer)
+    processTimer = setTimeout(() => void processCards(), 150)
+  })
   observer.observe(feed, { childList: true, subtree: true })
   void processCards()
 }
@@ -73,7 +78,11 @@ async function processCards(): Promise<void> {
   for (const card of cards) {
     if (card.dataset.frostId) {
       const lead = state.leads.get(card.dataset.frostId)
-      if (lead) applyCardState(card, lead)
+      if (lead) {
+        // Maps re-renders card HTML on click/expand — badge gets wiped, re-inject it
+        if (!card.querySelector('.frost-badge')) injectBadge(card, lead, onAction)
+        applyCardState(card, lead)
+      }
       continue
     }
 
