@@ -60,7 +60,19 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <span className="logo">Frost</span>
+        <span className="logo">
+          <svg width="20" height="20" viewBox="0 0 262 262" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="262" height="262" fill="#101115" rx="52"/>
+            <path d="M86 176H116V206H86L56 176V146H86V176ZM206 176L176 206H146V176H176V146H206V176ZM143.154 118.846L176 131L143.154 143.154L131 176L118.846 143.154L86 131L118.846 118.846L131 86L143.154 118.846ZM116 86H86V116H56V86L86 56H116V86ZM206 86V116H176V86H146V56H176L206 86Z" fill="url(#sp0)"/>
+            <defs>
+              <linearGradient id="sp0" x1="131" y1="56" x2="131" y2="206" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#3399FF"/>
+                <stop offset="1" stopColor="#1C4F9C"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          Frost
+        </span>
         <button
           className="gear-btn"
           title="Settings"
