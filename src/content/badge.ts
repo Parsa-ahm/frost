@@ -10,10 +10,19 @@ export type ActionCallback = (leadId: string, action: BadgeAction, notes: string
 // without re-binding click listeners.
 const badgeLeads = new WeakMap<Element, IcyLead>()
 
+const STATUS_LABELS: Partial<Record<string, string>> = {
+  no_answer: 'No Answer',
+  called: 'Called',
+  rejected: 'Rejected',
+  qualified: 'Qualified',
+}
+
 function applyStatus(badge: HTMLElement, lead: IcyLead): void {
   badge.dataset.status = lead.status
-  if (lead.status === 'qualified' && lead.twentyId) badge.dataset.crm = 'true'
+  const crm = lead.status === 'qualified' && !!lead.twentyId
+  if (crm) badge.dataset.crm = 'true'
   else delete badge.dataset.crm
+  badge.textContent = crm ? 'Qualified ✓' : (STATUS_LABELS[lead.status] ?? '')
 }
 
 // `anchor` switches to inline placement (badge appended into the anchor, e.g.

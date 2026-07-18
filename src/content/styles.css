@@ -1,43 +1,44 @@
 /* Frost content script styles — injected on Google Maps */
 
-/* Status badge dot on each Maps card */
+/* Status pill on each Maps card */
 .frost-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 22px;
+  bottom: 10px;
+  left: 12px;
   height: 22px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.9);
+  min-width: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
   cursor: pointer;
   z-index: 9999;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: opacity 0.15s, transform 0.15s;
 }
 
 .frost-badge:hover {
-  transform: scale(1.2);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  opacity: 0.85;
+  transform: scale(1.04);
 }
 
-/* Badge colors per status */
-.frost-badge[data-status="pending"]    { background: #6b7280; }
-.frost-badge[data-status="no_answer"] { background: #f59e0b; }
-.frost-badge[data-status="called"]    { background: #3b82f6; }
-.frost-badge[data-status="rejected"]  { background: #ef4444; }
-.frost-badge[data-status="qualified"] { background: #22c55e; }
-
-/* CRM checkmark on qualified badge */
-.frost-badge[data-status="qualified"][data-crm="true"]::after {
-  content: '✓';
-  color: white;
-  font-size: 10px;
+/* Pending — gray blank pill, no label */
+.frost-badge[data-status="pending"] {
+  background: rgba(107,114,128,0.25);
+  border: 1.5px solid rgba(107,114,128,0.45);
+  color: transparent;
 }
+
+/* Labeled statuses */
+.frost-badge[data-status="no_answer"] { background: #f97316; color: #fff; }
+.frost-badge[data-status="called"]    { background: #3b82f6; color: #fff; }
+.frost-badge[data-status="rejected"]  { background: #ef4444; color: #fff; }
+.frost-badge[data-status="qualified"] { background: #22c55e; color: #fff; }
 
 /* Make the Maps card position:relative so our badge can be absolute */
 [data-frost-id]:not([data-frost-no-hide]) {
